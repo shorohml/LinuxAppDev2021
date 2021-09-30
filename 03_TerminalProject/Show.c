@@ -8,9 +8,14 @@
 
 struct Text {
     char **data;
+    int *len;
     int num_lines;
     int max_line_len;
 };
+
+int min(int x, int y) { return x < y ? x : y; }
+
+int max(int x, int y) { return x < y ? y : x; }
 
 int read_text(const char *path, struct Text *text) {
     FILE *file;
@@ -71,37 +76,41 @@ int read_text(const char *path, struct Text *text) {
     }
     memcpy((text->data)[line_idx], data + line_start, line_len - 1);
     (text->data)[line_idx][line_len - 1] = 0;
+
+    if (NULL == (text->len = malloc(sizeof(int) * text->num_lines))) {
+        return -1;
+    }
+    for (int i = 0; i < text->num_lines; ++i) {
+        text->len[i] = strlen(text->data[i]);
+    }
+
     free(data);
     return 0;
 }
 
-int min(int x, int y) { return x < y ? x : y; }
-
-void draw_lines(WINDOW *win, struct Text text, int start, int num_lines) {
-    char *line;
-
-    if (start > text.num_lines) {
-        return;
-    }
-    if (NULL == (line = malloc(sizeof(char) * (text.max_line_len + 12)))) {
+void draw_lines(WINDOW *win, struct Text text, char *line, int x, int y,
+                int width, int height) {
+    if (y > text.num_lines || y < 0) {
         return;
     }
     werase(win);
-    int end = min(start + num_lines, text.num_lines);
-    for (int i = start; i < end; ++i) {
-        sprintf(line, "%d: %s", i + 1, text.data[i]);
-        mvwaddnstr(win, i + 1 - start, 1, line, -1);
+    int end = min(y + height, text.num_lines);
+    for (int i = y; i < end; ++i) {
+        int shift = min(x, text.len[i]);
+        sprintf(line, " %d: %s", i + 1, text.data[i] + shift);
+        mvwaddnstr(win, i + 1 - y, 1, line, width);
     }
     box(win, 0, 0);
-    free(line);
     wrefresh(win);
 }
 
 int main(int argc, char **argv) {
     WINDOW *win;
     struct Text text;
+    char *line;
     int c = 0;
-    int shift = 0;
+    int x = 0, y = 0;
+    int next;
 
     if (argc != 2) {
         printf("%s", "Usage: ./Show path_to_text_file\n");
@@ -112,9 +121,10 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    initscr(); // init ncurses
-    noecho();  // disable display of entered character
-    cbreak();  // read entered character right after pressing the button
+    initscr();   // init ncurses
+    noecho();    // disable display of entered character
+    cbreak();    // read entered character right after pressing the button
+    curs_set(0); // hide cursor
 
     printw("File: %s; Size: %d", argv[1], text.num_lines);
     refresh();
@@ -125,14 +135,42 @@ int main(int argc, char **argv) {
     scrollok(win, TRUE);
     box(win, 0, 0);
 
+    if (NULL == (line = malloc(sizeof(char) * (text.max_line_len + 13)))) {
+        return -1;
+    }
+
     // read entered characters
-    draw_lines(win, text, 0, LINES - 2 * DX);
+    draw_lines(win, text, line, 0, 0, COLS - 2 * DX, LINES - 2 * DX);
     while (27 != (c = wgetch(win))) {
-        if (' ' != c) {
+        switch (c) {
+        case ' ':
+        case KEY_NPAGE:
+            next = y + LINES - 2 * DX - 2;
+            if (next < text.num_lines) {
+                y = next;
+            }
+            break;
+        case KEY_PPAGE:
+            y -= LINES - 2 * DX - 2;
+            break;
+        case KEY_DOWN:
+            y += 1;
+            break;
+        case KEY_UP:
+            y -= 1;
+            break;
+        case KEY_RIGHT:
+            x += 1;
+            break;
+        case KEY_LEFT:
+            x -= 1;
+            break;
+        default:
             continue;
         }
-        shift += LINES - 2 * DX - 2;
-        draw_lines(win, text, shift, LINES - 2 * DX);
+        y = max(min(y, text.num_lines - 1), 0);
+        x = max(x, 0);
+        draw_lines(win, text, line, x, y, COLS - 2 * DX, LINES - 2 * DX);
     }
 
     // delete window
@@ -140,6 +178,7 @@ int main(int argc, char **argv) {
     endwin();
 
     // free memory
+    free(line);
     for (int i = 0; i < text.num_lines; ++i) {
         free(text.data[i]);
     }
