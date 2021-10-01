@@ -88,6 +88,14 @@ int read_text(const char *path, struct Text *text) {
     return 0;
 }
 
+void free_text(struct Text text) {
+    for (int i = 0; i < text.num_lines; ++i) {
+        free(text.data[i]);
+    }
+    free(text.data);
+    free(text.len);
+}
+
 void draw_lines(WINDOW *win, struct Text text, char *line, int x, int y,
                 int width, int height) {
     if (y > text.num_lines || y < 0) {
@@ -179,8 +187,5 @@ int main(int argc, char **argv) {
 
     // free memory
     free(line);
-    for (int i = 0; i < text.num_lines; ++i) {
-        free(text.data[i]);
-    }
-    free(text.data);
+    free_text(text);
 }
