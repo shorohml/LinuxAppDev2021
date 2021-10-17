@@ -3,13 +3,12 @@ DELAY=${1:-0.0}
 hexdump -v -e '"%_ad " /1 "%x\n"' > dump.txt
 cat dump.txt | sed -e '/[0-9]\+ a$/!d' | cut -d ' ' -f1 > sep.txt
 cat dump.txt | sed -e '/[0-9]\+ a$/d'  | shuf > dump_shuf.txt
+cat dump_shuf.txt | cut -d ' ' -f1 > dump_shuf_idx.txt
+cat dump_shuf.txt | cut -d ' ' -f2 > dump_shuf_smb.txt
 NUM_LINES="$(cat sep.txt | wc -l)"
 
 tput clear
-while read LINE; do
-    IDX="$(cut -d' ' -f1 <<<"$LINE")"
-    SMB="$(cut -d' ' -f2 <<<"$LINE")"
-
+while read IDX <&3 && read SMB <&4; do
     if [[ $SMB == "20" ]]; then
         continue
     fi
@@ -26,9 +25,11 @@ while read LINE; do
 
     sleep $DELAY
     tput cup $LINE_IDX $COL_IDX; /bin/echo -e "\\x$SMB"
-done <dump_shuf.txt
+done 3<dump_shuf_idx.txt 4<dump_shuf_smb.txt
 tput cup $NUM_LINES 0
 
 rm ./dump.txt
 rm ./dump_shuf.txt
+rm ./dump_shuf_idx.txt
+rm ./dump_shuf_smb.txt
 rm ./sep.txt
