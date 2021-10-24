@@ -5,7 +5,7 @@ TRASH =
 all: range
 
 range: range.c
-~      cc -g -O0 range.c -o range
+~      cc -g -O0 $^ -o $@
 
 test: range
 ~     gdb --command=test1.gdb --batch --quiet --args ./range 1 12       | grep ^@@@ | cmp test1.txt
