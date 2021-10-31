@@ -5,7 +5,7 @@ TRASH = protected_remove.so test_copy.txt test_out.txt test_PROTECTED.txt
 all: move
 
 protected_remove: protected_remove.c
-~                 cc $^ -shared -o $@.so
+~                 cc $^ -shared -o $@.so -ldl
 
 move: move.c
 ~      cc -g -O0 $^ -o $@
@@ -29,7 +29,7 @@ test: move protected_remove
 ~     ./move test_copy.txt ../ || [ $$? -eq 21 ]
 ~
 ~     @echo "\n actual move:\n"
-~     ./move test_copy.txt test_out.txt && cmp test_out.txt test.txt
+~     ./move test_copy.txt test_out.txt && cmp test_out.txt test.txt && [ ! -f test_copy.txt ]
 ~     rm test_out.txt
 ~
 ~     @echo "\n open strace injection for input file:\n"
@@ -49,10 +49,13 @@ test: move protected_remove
 ~     touch test_out.txt # have to do this or -P won't work
 ~     strace -P test_out.txt -e fault=write:error=EPERM ./move test_copy.txt test_out.txt || [ $$? -eq 1 ] && ( cmp test_copy.txt test.txt )
 ~
-~     @echo "\n protected remove:\n"
+~     @echo "\n protected remove with PROTECTED in name:\n"
 ~     cp test.txt test_PROTECTED.txt
 ~     LD_PRELOAD=protected_remove.so ./move test_PROTECTED.txt test_out.txt && cmp test_out.txt test.txt && [ -f test_PROTECTED.txt ]
 ~
+~     @echo "\n protected remove without PROTECTED in name:\n"
+~     cp test.txt test_copy.txt
+~     LD_PRELOAD=protected_remove.so ./move test_copy.txt test_out.txt && cmp test_out.txt test.txt && [ ! -f test_copy.txt ]
 ~     rm -f $(TRASH)
 
 clean:
