@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     char *buffer;
     char *inpath, *outpath;
     size_t n_read, n_wrote;
-    int err_code;
+    int err_code, err_code_saved;
 
     if (argc != 3) {
         fprintf(stderr, "Usage: ./move infile outfile\n");
@@ -94,23 +94,35 @@ int main(int argc, char **argv) {
     while (0 != (n_read = fread(buffer, sizeof(char), BUFFSIZE, infile))) {
         if (n_read != BUFFSIZE && ferror(infile)) {
             /* error in fread */
+            err_code_saved = errno;
             err_code = cleanup(buffer, infile, outfile, outpath);
             if (0 != err_code) {
                 return err_code;
             }
             perror("read");
-            return errno;
+            return err_code_saved;
         }
         n_wrote = fwrite(buffer, sizeof(char), n_read, outfile);
         if (n_wrote != n_read) {
             /* error in fwrite */
+            err_code_saved = errno;
             err_code = cleanup(buffer, infile, outfile, outpath);
             if (0 != err_code) {
                 return err_code;
             }
             perror("write");
-            return errno;
+            return err_code_saved;
         }
+    }
+    if (ferror(infile)) {
+        /* error in fread */
+        err_code_saved = errno;
+        err_code = cleanup(buffer, infile, outfile, outpath);
+        if (0 != err_code) {
+            return err_code;
+        }
+        perror("read");
+        return err_code_saved;
     }
 
     err_code = cleanup(buffer, infile, outfile, inpath);
