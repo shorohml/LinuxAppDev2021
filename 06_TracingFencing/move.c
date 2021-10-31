@@ -1,9 +1,30 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/stat.h>
 
 #define BUFFSIZE 4096
+
+/*
+Check if paths point to the same file
+Return 0 if files are not the same or one/both of the files doesn't exist
+*/
+int is_same_file(const char *path_1, const char *path_2) {
+    struct stat file_1_st, file_2_st;
+
+    if (0 == strcmp(path_1, path_2)) {
+        return 1;
+    }
+    if (-1 == (stat(path_1, &file_1_st))) {
+        return 0;
+    }
+    if (-1 == (stat(path_2, &file_2_st))) {
+        return 0;
+    }
+    return file_1_st.st_dev == file_2_st.st_dev &&
+           file_1_st.st_ino == file_2_st.st_ino;
+}
 
 /* Cleanup:
 1. Free buffer
@@ -13,11 +34,11 @@
 int cleanup(char *buffer, FILE *infile, FILE *outfile, const char *path) {
     free(buffer);
     if (0 != fclose(infile)) {
-        perror("");
+        perror("infile");
         return errno;
     }
     if (0 != fclose(outfile)) {
-        perror("");
+        perror("outfile");
         return errno;
     }
     if (0 != remove(path)) {
@@ -42,32 +63,30 @@ int main(int argc, char **argv) {
     outpath = argv[2];
 
     /* won't work for the same file */
-    if (0 == strcmp(inpath, outpath)) {
+    if (is_same_file(inpath, outpath)) {
         fprintf(stderr, "%s and %s are the same files\n", inpath, outpath);
         return -1;
     }
 
-    /* allocate buffer */
-    if (NULL == (buffer = (char *)malloc(sizeof(char) * BUFFSIZE))) {
-        perror("");
-        return errno;
-    }
-
     /* open infile  */
     if (NULL == (infile = fopen(inpath, "r"))) {
-        free(buffer);
         perror(inpath);
         return errno;
     }
 
     /* open outfile  */
     if (NULL == (outfile = fopen(outpath, "w+"))) {
-        free(buffer);
         if (0 != fclose(infile)) {
             perror(inpath);
             return errno;
         }
         perror(outpath);
+        return errno;
+    }
+
+    /* allocate buffer */
+    if (NULL == (buffer = (char *)malloc(sizeof(char) * BUFFSIZE))) {
+        perror("buffer");
         return errno;
     }
 
