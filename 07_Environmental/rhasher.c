@@ -1,14 +1,13 @@
-#include "rhash.h"
 #include <ctype.h>
 #include <errno.h>
 #include <readline/readline.h>
+#include <rhash.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "config.h"
 
 #define NUM_ALGOS 4
-
-// #define USE_LIBREADLINE
 
 void free_resources(char **line, size_t *n) {
     free(*line);
@@ -35,11 +34,11 @@ int main() {
 
     rhash_library_init(); /* initialize static data */
 
-#ifdef USE_LIBREADLINE
+#ifdef WITH_LIBREADLINE
     while (NULL != (line = readline("> "))) {
 #endif
-#ifndef USE_LIBREADLINE
-    for (printf("> "); -1 != getline(&line, &n, stdin); printf("> ")) {
+#ifndef WITH_LIBREADLINE
+        for (printf("> "); - 1 != getline(&line, &n, stdin); printf("> ")) {
 #endif
             /* read command arguments */
             if (NULL == (algo_name = strtok(line, " "))) {
@@ -58,7 +57,7 @@ int main() {
                 continue;
             }
 
-#ifndef USE_LIBREADLINE
+#ifndef WITH_LIBREADLINE
             /* Remove \n from filepath */
             filepath[strlen(filepath) - 1] = 0;
 #endif
