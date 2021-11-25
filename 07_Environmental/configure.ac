@@ -26,7 +26,7 @@ AC_CHECK_FUNCS([strerror])
 
 AC_ARG_WITH([readline],
 [AS_HELP_STRING([--with-readline],
-    [enable experimental support for readline])],
+    [enable support for readline])],
 [AC_DEFINE([WITH_READLINE], [1], [Define if you have libreadline])],
 [with_readline=no])
 
