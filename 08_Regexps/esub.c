@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
     regoff_t shift;
     int errcode, n_links;
     char *errbuf, *res, *tmp_res, *subs, *subs_res;
-    size_t i, res_len, subs_len, orig_len;
+    size_t i, res_len, subs_len, orig_len, buff_size;
     struct SubLink *sub_links;
 
     if (argc != 4) {
@@ -233,7 +233,8 @@ int main(int argc, char **argv) {
     }
 
     orig_len = strlen(argv[3]);
-    if (NULL == (res = malloc(sizeof(char) * orig_len))) {
+    buff_size = orig_len;
+    if (NULL == (res = malloc(sizeof(char) * buff_size))) {
         regfree(&preg);
         free(errbuf);
         free(pmatch);
@@ -248,10 +249,10 @@ int main(int argc, char **argv) {
     i = 0;
     res_len = 0;
     while (!(errcode = regexec(&preg, argv[3] + shift, NMATCH, pmatch, 0))) {
-        if (res_len + pmatch[0].rm_so < orig_len) {
+        if (res_len + pmatch[0].rm_so + 1 < buff_size) {
             /* Increase buffer size */
-            orig_len *= 2;
-            if (NULL == (tmp_res = malloc(sizeof(char) * orig_len))) {
+            buff_size *= 2;
+            if (NULL == (tmp_res = malloc(sizeof(char) * buff_size))) {
                 regfree(&preg);
                 free(errbuf);
                 free(pmatch);
@@ -286,10 +287,10 @@ int main(int argc, char **argv) {
         }
         subs_len = strlen(subs_res);
 
-        if (res_len + subs_len < orig_len) {
+        if (res_len + subs_len + 1 < buff_size) {
             /* Increase buffer size */
-            orig_len *= 2;
-            if (NULL == (tmp_res = malloc(sizeof(char) * orig_len))) {
+            buff_size *= 2;
+            if (NULL == (tmp_res = malloc(sizeof(char) * buff_size))) {
                 regfree(&preg);
                 free(errbuf);
                 free(pmatch);
@@ -312,6 +313,28 @@ int main(int argc, char **argv) {
         res_len += subs_len;
         free(subs_res);
     }
+    if (res_len + orig_len - shift + 1 > buff_size) {
+        /* Increase buffer size */
+        buff_size *= 2;
+        if (NULL == (tmp_res = malloc(sizeof(char) * buff_size))) {
+            regfree(&preg);
+            free(errbuf);
+            free(pmatch);
+            free(subs);
+            free(sub_links);
+            free(res);
+            perror("");
+            return errno;
+        }
+        strcpy(tmp_res, res);
+        free(res);
+        res = tmp_res;
+        tmp_res = NULL;  
+    }
+    for (size_t j = 0; j < orig_len - shift; ++j) {
+        res[i++] = *(argv[3] + shift + j);
+    }
+    res[i] = 0;
 
     printf("%s\n", res);
 
