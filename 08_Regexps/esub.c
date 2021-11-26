@@ -262,6 +262,7 @@ int main(int argc, char **argv) {
                 return errno;
             }
             strcpy(tmp_res, res);
+            free(res);
             res = tmp_res;
             tmp_res = NULL;
         }
@@ -300,6 +301,7 @@ int main(int argc, char **argv) {
                 return errno;
             }
             strcpy(tmp_res, res);
+            free(res);
             res = tmp_res;
             tmp_res = NULL;
         }
