@@ -14,9 +14,8 @@ AC_PROG_CC
 AC_CHECK_LIB([rhash],[rhash_library_init],[],[AC_MSG_ERROR([RHash is needed])])
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdlib.h string.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 AC_CHECK_HEADER([rhash.h])
-AC_CHECK_HEADER([readline/readline.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
@@ -32,7 +31,7 @@ AC_ARG_WITH([readline],
 
 LIBREADLINE=
 AS_IF([test "x$with_readline" != xno],
-[AC_CHECK_LIB([readline],[readline],[],[AC_MSG_ERROR([readline is needed])])])
+[AC_CHECK_LIB([readline],[readline],[],[AC_MSG_ERROR([readline is needed])]) AC_CHECK_HEADER([readline/readline.h])])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
