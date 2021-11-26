@@ -151,6 +151,7 @@ char *substitute(struct SubLink *sub_links, int n_links, const char *subs,
     }
 
     int res_j = 0;
+    size_t part_len = 0;
     for (int i = 0; i < n_links; ++i) {
         if (0 == i) {
             for (int j = 0; j < sub_links[i].pbegin - subs; ++j) {
@@ -162,11 +163,15 @@ char *substitute(struct SubLink *sub_links, int n_links, const char *subs,
                 res[res_j++] = *(sub_links[i - 1].pend + j);
             }
         }
-        size_t part_len =
+        part_len =
             pmatch[sub_links[i].num].rm_eo - pmatch[sub_links[i].num].rm_so;
         for (size_t j = 0; j < part_len; ++j) {
             res[res_j++] = *(orig + pmatch[sub_links[i].num].rm_so + j);
         }
+    }
+    part_len = (subs + subs_len) - sub_links[n_links - 1].pend;
+    for (size_t j = 0; j < part_len; ++j) {
+        res[res_j++] = *(sub_links[n_links - 1].pend + j);
     }
     res[res_len] = 0;
     return res;
@@ -249,6 +254,10 @@ int main(int argc, char **argv) {
     i = 0;
     res_len = 0;
     while (!(errcode = regexec(&preg, argv[3] + shift, NMATCH, pmatch, 0))) {
+        if (pmatch[0].rm_eo == pmatch[0].rm_so) {
+            break;
+        }
+
         if (res_len + pmatch[0].rm_so + 1 < buff_size) {
             /* Increase buffer size */
             buff_size *= 2;
@@ -274,8 +283,8 @@ int main(int argc, char **argv) {
         res[i] = 0;
         res_len += pmatch[0].rm_so;
 
-        if (NULL == (subs_res = substitute(sub_links, n_links, subs, argv[3] + shift,
-                                           pmatch))) {
+        if (NULL == (subs_res = substitute(sub_links, n_links, subs,
+                                           argv[3] + shift, pmatch))) {
             regfree(&preg);
             free(errbuf);
             free(pmatch);
@@ -285,6 +294,7 @@ int main(int argc, char **argv) {
             perror("");
             return errno;
         }
+
         subs_len = strlen(subs_res);
 
         if (res_len + subs_len + 1 < buff_size) {
@@ -329,7 +339,7 @@ int main(int argc, char **argv) {
         strcpy(tmp_res, res);
         free(res);
         res = tmp_res;
-        tmp_res = NULL;  
+        tmp_res = NULL;
     }
     for (size_t j = 0; j < orig_len - shift; ++j) {
         res[i++] = *(argv[3] + shift + j);

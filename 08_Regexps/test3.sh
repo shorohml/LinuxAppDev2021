@@ -1,0 +1,1 @@
+test "` ./esub '(a*(b*))' '\2-\1=' 'aaabbbccc' `" == "` echo 'aaabbbccc' | sed -E 's/(a*(b*))/\2-\1=/' `"
