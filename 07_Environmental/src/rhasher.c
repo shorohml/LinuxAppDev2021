@@ -39,8 +39,7 @@ int main() {
 
 #ifdef WITH_READLINE
     while (NULL != (line = readline("> "))) {
-#endif
-#ifndef WITH_READLINE
+#else
     for (printf("> "); - 1 != getline(&line, &n, stdin); printf("> ")) {
         /* mimic readline behavior */
         if (!(isatty(fileno(stdin)))) {
