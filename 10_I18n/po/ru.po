@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guess 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-25 22:51+0300\n"
+"POT-Creation-Date: 2021-12-25 23:47+0300\n"
 "PO-Revision-Date: 2021-12-25 22:52+0300\n"
 "Last-Translator: shoroh <shoroh@shoroh-laptop>\n"
 "Language-Team: Russian\n"
@@ -18,33 +18,33 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: src/guess.c:28
+#: ../src/guess.c:28
 #, c-format
 msgid "Guess a number from 1 to %d\n"
 msgstr "Загадайте число от 1 до %d\n"
 
-#: src/guess.c:31
+#: ../src/guess.c:31
 #, c-format
 msgid "Is the number greater than %d? (y/n)\n"
 msgstr "Это число больше %d? (д/н)\n"
 
-#: src/guess.c:36
+#: ../src/guess.c:36
 msgid "y\n"
 msgstr "д\n"
 
-#: src/guess.c:36
+#: ../src/guess.c:36
 msgid "yes\n"
 msgstr "да\n"
 
-#: src/guess.c:38
+#: ../src/guess.c:38
 msgid "n\n"
 msgstr "н\n"
 
-#: src/guess.c:38
+#: ../src/guess.c:38
 msgid "no\n"
 msgstr "нет\n"
 
-#: src/guess.c:45
+#: ../src/guess.c:45
 #, c-format
 msgid "Your number is %d\n"
 msgstr "Вы загадали %d\n"

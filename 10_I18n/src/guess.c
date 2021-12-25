@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <libgen.h>
 #include <libintl.h>
 #include <locale.h>
 #include <stdio.h>
@@ -7,9 +6,8 @@
 #include <string.h>
 
 #define UPPER 100
-
 #define _(STRING) gettext(STRING)
-#define LOCALE_PATH "."
+#define LOCALE_PATH "po"
 
 char *to_lower(char *s) {
     for (char *p = s; *p; ++p) {
@@ -18,12 +16,11 @@ char *to_lower(char *s) {
     return s;
 }
 
-int main(int argc, char **argv) {
+int main() {
     int lower = 1, upper = UPPER, half;
     size_t n;
-    char *answer = NULL, *dir;
+    char *answer = NULL;
 
-    dir = dirname(realpath(argv[0], NULL));
     setlocale(LC_ALL, "");
     bindtextdomain("guess", LOCALE_PATH);
     textdomain("guess");
