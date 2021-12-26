@@ -14,18 +14,8 @@ const char *argp_program_version = "guess 0.0.1"; /**< Program version. */
 const char *argp_program_bug_address =
     "<no-reply>"; /**<  Bug report address. */
 
-static char doc[] =
-    "Program for guessing number from 1 to 100."; /**< Program documentation. */
-
-static char args_doc[] = ""; /**< A description of the arguments we accept. */
-
-static struct argp_option options[] = {
-    {"roman", 'r', 0, 0, "Print romain numbers"},
-    {"convert", 'c', 0, 0, "Convert roman number to arabic"},
-    {0}}; /**< The options we understand. */
-
 struct arguments {
-    int roman; /**< 1 to use roman numbers, 0 to use arabic numbers */
+    int roman;   /**< 1 to use roman numbers, 0 to use arabic numbers */
     int convert; /**< 1 to run in convert mode, 0 to guess number */
 };
 
@@ -65,9 +55,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     return 0;
 }
 
-static struct argp argp = {options, parse_opt, args_doc,
-                           doc}; /**< Our argp parser. */
-
 /**
  * Convert every character in string \p s to lower regiter.
  *
@@ -94,7 +81,7 @@ static char *to_upper(char *s) {
         *p = toupper(*p);
     }
     return s;
-}\
+}
 
 const char *roman_table[UPPER] = {
     "I",       "II",     "III",     "IV",       "V",      "VI",      "VII",
@@ -202,16 +189,26 @@ int main(int argc, char **argv) {
     char *answer = NULL;
     struct arguments arguments;
 
+    setlocale(LC_ALL, "");
+    bindtextdomain("guess", LOCALE_PATH);
+    textdomain("guess");
+
+    struct argp_option options[] = {
+        {"roman", 'r', 0, 0, _("Print romain numbers")},
+        {"convert", 'c', 0, 0, _("Convert roman number to arabic")},
+        {0}}; /* The options we understand. */
+    struct argp argp = {
+        options, parse_opt, "",
+        _("Program for guessing number from 1 to 100.")}; /* Our argp parser. */
+
     /* Default values. */
     arguments.roman = 0;
     arguments.convert = 0;
 
     /* Parse our arguments; every option seen by parse_opt will
        be reflected in arguments. */
+    textdomain("libc");
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
-
-    setlocale(LC_ALL, "");
-    bindtextdomain("guess", LOCALE_PATH);
     textdomain("guess");
 
     if (arguments.convert) {

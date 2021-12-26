@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guess 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-26 20:55+0300\n"
+"POT-Creation-Date: 2021-12-26 21:24+0300\n"
 "PO-Revision-Date: 2021-12-25 22:52+0300\n"
 "Last-Translator: shoroh <shoroh@shoroh-laptop>\n"
 "Language-Team: Russian\n"
@@ -18,63 +18,76 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../src/guess.c:220
+#: ../src/guess.c:197
+msgid "Print romain numbers"
+msgstr "Выводить числа в римской системе счисления"
+
+#: ../src/guess.c:198
+msgid "Convert roman number to arabic"
+msgstr "Преобразовать число в римской системе счисления в арабскую систему"
+
+#
+#: ../src/guess.c:202
+msgid "Program for guessing number from 1 to 100."
+msgstr "Программа для угадывания от 1 до 100."
+
+#: ../src/guess.c:217
 #, c-format
 msgid "Enter roman number:\n"
 msgstr "Введите число в римской системе счисления:\n"
 
-#: ../src/guess.c:229
+#: ../src/guess.c:226
 #, c-format
 msgid "Invalid roman number\n"
 msgstr "Некорректное число в римской системе счисления\n"
 
-#: ../src/guess.c:235
+#: ../src/guess.c:232
 #, c-format
 msgid "Arabic number: %d\n"
 msgstr "Число в арабской системе счисления: %d\n"
 
-#: ../src/guess.c:243
+#: ../src/guess.c:240
 #, c-format
 msgid "Guess a number from I to %s\n"
 msgstr "Загадайте число от I до %s\n"
 
-#: ../src/guess.c:245
+#: ../src/guess.c:242
 #, c-format
 msgid "Guess a number from 1 to %d\n"
 msgstr "Загадайте число от 1 до %d\n"
 
-#: ../src/guess.c:250
+#: ../src/guess.c:247
 #, c-format
 msgid "Is the number greater than %s? (y/n)\n"
 msgstr "Это число больше %s? (д/н)\n"
 
-#: ../src/guess.c:252
+#: ../src/guess.c:249
 #, c-format
 msgid "Is the number greater than %d? (y/n)\n"
 msgstr "Это число больше %d? (д/н)\n"
 
-#: ../src/guess.c:261
+#: ../src/guess.c:258
 msgid "y\n"
 msgstr "д\n"
 
-#: ../src/guess.c:261
+#: ../src/guess.c:258
 msgid "yes\n"
 msgstr "да\n"
 
-#: ../src/guess.c:263
+#: ../src/guess.c:260
 msgid "n\n"
 msgstr "н\n"
 
-#: ../src/guess.c:263
+#: ../src/guess.c:260
 msgid "no\n"
 msgstr "нет\n"
 
-#: ../src/guess.c:271
+#: ../src/guess.c:268
 #, c-format
 msgid "Your number is %s\n"
 msgstr "Вы загадали %s\n"
 
-#: ../src/guess.c:273
+#: ../src/guess.c:270
 #, c-format
 msgid "Your number is %d\n"
 msgstr "Вы загадали %d\n"
