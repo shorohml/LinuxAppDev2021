@@ -20,11 +20,13 @@ static char doc[] =
 static char args_doc[] = ""; /**< A description of the arguments we accept. */
 
 static struct argp_option options[] = {
-    {"roman", 'r', 0, 0, "Work with romain numbers"},
+    {"roman", 'r', 0, 0, "Print romain numbers"},
+    {"convert", 'c', 0, 0, "Convert roman number to arabic"},
     {0}}; /**< The options we understand. */
 
 struct arguments {
     int roman; /**< 1 to use roman numbers, 0 to use arabic numbers */
+    int convert; /**< 1 to run in convert mode, 0 to guess number */
 };
 
 /**
@@ -45,6 +47,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     switch (key) {
     case 'r':
         arguments->roman = 1;
+        break;
+
+    case 'c':
+        arguments->convert = 1;
         break;
 
     case ARGP_KEY_ARG:
@@ -75,6 +81,20 @@ static char *to_lower(char *s) {
     }
     return s;
 }
+
+/**
+ * Convert every character in string \p s to upper regiter.
+ *
+ * @param s Input string
+ *
+ * @returns Result string
+ */
+static char *to_upper(char *s) {
+    for (char *p = s; *p; ++p) {
+        *p = toupper(*p);
+    }
+    return s;
+}\
 
 const char *roman_table[UPPER] = {
     "I",       "II",     "III",     "IV",       "V",      "VI",      "VII",
@@ -107,6 +127,75 @@ static const char *to_roman(int num) {
     return roman_table[num - 1];
 }
 
+/**
+ * Convert one symbol from roman number \p digit to integer.
+ *
+ * @param digit Roman number symbol
+ *
+ * @returns Integer value (-1 in case of invalid symbol)
+ */
+static int from_roman_digit(const char digit) {
+    switch (digit) {
+    case 'I':
+        return 1;
+    case 'V':
+        return 5;
+    case 'X':
+        return 10;
+    case 'L':
+        return 50;
+    case 'C':
+        return 100;
+    case 'D':
+        return 500;
+    case 'M':
+        return 1000;
+    }
+    return -1;
+}
+
+/**
+ * Convert roman number \p roman to arabic number.
+ *
+ * @param roman Roman number
+ *
+ * @returns Arabic number (-1 in case of invalid roman number)
+ */
+static int from_roman(const char *roman) {
+    if (!(*roman)) {
+        return -1;
+    }
+
+    int prev;
+    if (-1 == (prev = from_roman_digit(roman[0]))) {
+        return -1;
+    }
+
+    int curr = prev, sum = 0;
+    size_t len = strlen(roman);
+
+    for (size_t i = 1; i < len; ++i) {
+        if ('\n' == roman[i]) {
+            sum += prev;
+            return sum;
+        }
+
+        if (-1 == (curr = from_roman_digit(roman[i]))) {
+            return -1;
+        }
+
+        if (prev >= curr) {
+            sum += prev;
+        } else {
+            sum -= prev;
+        }
+
+        prev = curr;
+    }
+    sum += curr;
+    return sum;
+}
+
 int main(int argc, char **argv) {
     int lower = 0, upper = UPPER, half;
     size_t n;
@@ -115,6 +204,7 @@ int main(int argc, char **argv) {
 
     /* Default values. */
     arguments.roman = 0;
+    arguments.convert = 0;
 
     /* Parse our arguments; every option seen by parse_opt will
        be reflected in arguments. */
@@ -123,6 +213,31 @@ int main(int argc, char **argv) {
     setlocale(LC_ALL, "");
     bindtextdomain("guess", LOCALE_PATH);
     textdomain("guess");
+
+    if (arguments.convert) {
+        int arabic;
+
+        printf(_("Enter roman number:\n"));
+
+        if (-1 == getline(&answer, &n, stdin)) {
+            perror("readline");
+            return -1;
+        }
+        answer = to_upper(answer);
+
+        if (-1 == (arabic = from_roman(answer))) {
+            printf(_("Invalid roman number\n"));
+            free(answer);
+            answer = NULL;
+            return -1;
+        }
+
+        printf(_("Arabic number: %d\n"), from_roman(answer));
+
+        free(answer);
+        answer = NULL;
+        return 0;
+    }
 
     if (arguments.roman) {
         printf(_("Guess a number from I to %s\n"), to_roman(UPPER));
@@ -157,4 +272,5 @@ int main(int argc, char **argv) {
     } else {
         printf(_("Your number is %d\n"), upper);
     }
+    return 0;
 }
