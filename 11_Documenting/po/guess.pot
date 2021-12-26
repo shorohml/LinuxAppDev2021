@@ -1,0 +1,18 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2021 Grigoriy Shoroshov
+# This file is distributed under the same license as the PACKAGE package.
+# Grigoriy Shoroshov np-reply, 2021.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: guess 0.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-25 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
