@@ -17,7 +17,7 @@ char *to_lower(char *s) {
 }
 
 int main() {
-    int lower = 1, upper = UPPER, half;
+    int lower = 0, upper = UPPER, half;
     size_t n;
     char *answer = NULL;
 
