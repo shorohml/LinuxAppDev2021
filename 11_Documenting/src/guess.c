@@ -6,28 +6,37 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define UPPER 100
-#define _(STRING) gettext(STRING)
-#define LOCALE_PATH "po"
+#define UPPER 100                 /**< Maximum number to guess */
+#define _(STRING) gettext(STRING) /**< Translation */
+#define LOCALE_PATH "po"          /**< Locate directory */
 
-const char *argp_program_version = "guess 0.0.1";
-const char *argp_program_bug_address = "<no-reply>";
+const char *argp_program_version = "guess 0.0.1"; /**< Program version. */
+const char *argp_program_bug_address =
+    "<no-reply>"; /**<  Bug report address. */
 
-/* Program documentation. */
-static char doc[] = "Program for guessing number from 1 to 100.";
+static char doc[] =
+    "Program for guessing number from 1 to 100."; /**< Program documentation. */
 
-/* A description of the arguments we accept. */
-static char args_doc[] = "";
+static char args_doc[] = ""; /**< A description of the arguments we accept. */
 
-/* The options we understand. */
 static struct argp_option options[] = {
-    {"roman", 'r', 0, 0, "Work with romain numbers"}, {0}};
+    {"roman", 'r', 0, 0, "Work with romain numbers"},
+    {0}}; /**< The options we understand. */
 
 struct arguments {
-    int roman;
+    int roman; /**< 1 to use roman numbers, 0 to use arabic numbers */
 };
 
-/* Parse a single option. */
+/**
+ * Parse a single option \p key with optional argument \p arg  when state is \p
+ * state
+ *
+ * @param key Commandline option
+ * @param arg Optional key argument
+ * @param state INternal parser state
+ *
+ * @returns Error state
+ */
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     /* Get the input argument from argp_parse, which we
        know is a pointer to our arguments structure. */
@@ -50,9 +59,16 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     return 0;
 }
 
-/* Our argp parser. */
-static struct argp argp = {options, parse_opt, args_doc, doc};
+static struct argp argp = {options, parse_opt, args_doc,
+                           doc}; /**< Our argp parser. */
 
+/**
+ * Convert every character in string \p s to lower regiter.
+ *
+ * @param s Input string
+ *
+ * @returns Result string
+ */
 static char *to_lower(char *s) {
     for (char *p = s; *p; ++p) {
         *p = tolower(*p);
@@ -75,8 +91,15 @@ const char *roman_table[UPPER] = {
     "LXXVIII", "LXXIX",  "LXXX",    "LXXXI",    "LXXXII", "LXXXIII", "LXXXIV",
     "LXXXV",   "LXXXVI", "LXXXVII", "LXXXVIII", "LXXXIX", "XC",      "XCI",
     "XCII",    "XCIII",  "XCIV",    "XCV",      "XCVI",   "XCVII",   "XCVIII",
-    "XCIX",    "C"};
+    "XCIX",    "C"}; /**< Table with roman numbers from 1 to UPPER. */
 
+/**
+ * Convert arabic number \p num to roman number.
+ *
+ * @param num Integer number
+ *
+ * @returns String with roman number
+ */
 static const char *to_roman(int num) {
     if (num < 1 || num > UPPER) {
         return "";
@@ -114,7 +137,10 @@ int main(int argc, char **argv) {
             printf(_("Is the number greater than %d? (y/n)\n"), half);
         }
 
-        getline(&answer, &n, stdin);
+        if (-1 == getline(&answer, &n, stdin)) {
+            perror("readline");
+            return -1;
+        }
         answer = to_lower(answer);
 
         if (!strcmp(answer, _("y\n")) || !strcmp(answer, _("yes\n"))) {
